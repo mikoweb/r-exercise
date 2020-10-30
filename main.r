@@ -1,5 +1,7 @@
 # install.packages("stringr")
+# install.packages("xlsx")
 library("stringr")
+library("xlsx")
 
 gospodarstwa = read.table(file="./storage/ROLN_3179.csv", header=TRUE, sep=";")
 
@@ -62,4 +64,20 @@ for(i in years[1]:years[length(years)]) {
   yearArea = gospodarstwa[sprintf("gospodarstwa.ogółem.powierzchnia.użytków.rolnych.%d..ha.", i)]
   print(sum(yearArea[-1,1]) / sum(yearUnits[-1,1]))
 }
+
+
+# Wczytaj dane z pliku ROLN_3179.xlsx arkusz OPIS.
+
+description = read.xlsx(file="./storage/ROLN_3179.xlsx", sheetName="OPIS")
+
+# Rozdziel na słowa wartości z kolumny B. Wybierz unikalne wartości i zapisz je do pliku w formacie CSV (1 kolumna „słowa”) o nazwie słowa.txt
+
+words = c()
+
+for(i in 1:length(description$ROLNICTWO)) {
+  words = c(words, strsplit(tolower(description$ROLNICTWO[i]), " ")[[1]])
+}
+
+wordsFrame = data.frame(words = unique(words))
+write.table(wordsFrame, file="słowa.txt")
 
